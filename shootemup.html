@@ -551,6 +551,7 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
         this.baddie = null;
         this.cursors = null;
         this.speed = 300;
+        this.explosions = null;
 
         this.weapons = [];
         this.currentWeapon = 0;
@@ -582,6 +583,7 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
             this.load.bitmapFont('shmupfont', 'assets/issue-007/assets/shmupfont.png', 'assets/issue-007/assets/shmupfont.xml');
             this.load.spritesheet('dude', 'assets/dude.png', 32, 48);
             this.load.spritesheet('baddie', 'assets/baddie.png', 32, 32);
+            this.load.spritesheet('kaboom', 'assets/explode.png', 128, 128);
 
             for (var i = 1; i <= 11; i++)
             {
@@ -593,7 +595,7 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
         },
 
         create: function () {
-
+            this.physics.startSystem(Phaser.Physics.ARCADE);
             this.background = this.add.tileSprite(0, 0, this.game.width, this.game.height, 'background');
             this.background.autoScroll(-40, 0);
 
@@ -620,6 +622,7 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
             this.player = this.add.sprite(64, 200, 'player');
 
             this.physics.arcade.enable(this.player);
+            
 
             this.player.body.collideWorldBounds = true;
 
@@ -636,18 +639,18 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
             var changeKey = this.input.keyboard.addKey(Phaser.Keyboard.ENTER);
             changeKey.onDown.add(this.nextWeapon, this);
 
+            this.baddie = this.add.group();
+            this.baddie.enableBody = true;
             for (var y = 1; y < 8; y++)
             {
                 for (var x = 11; x < 16; x++)
                 {
-                    this.add.sprite(x * 50, y * 50, 'baddie');
-                    // alien.anchor.setTo(0.5, 0.5);
-                    // alien.animations.add('fly', [ 0, 1, 2, 3 ], 20, true);
-                    // alien.play('fly');
-                    // alien.body.moves = false;
+                    this.baddie.create(x * 50, y * 50, 'baddie');
                 }
             }
-            
+            this.explosions = game.add.group();
+            this.explosions.createMultiple(30, 'kaboom');
+            this.explosions.forEach(setupInvader, this);
 
         },
 
@@ -680,36 +683,10 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
         },
 
         update: function () {
-            game.physics.arcade.collide(this.player, this.baddie);
-            game.physics.arcade.overlap(this.player, this.baddie, collisionHandler, null, this);
-            
-
-            function collisionHandler (bullet, alien) {
-                //  When a bullet hits an alien we kill them both
-                //bullet.kill();
-                this.baddie.kill();
-                //  Increase the score
-                // score += 20;
-                // scoreText.text = scoreString + score;
-                //  And create an explosion :)
-                // var explosion = explosions.getFirstExists(false);
-                // explosion.reset(alien.body.x, alien.body.y);
-                // explosion.play('kaboom', 30, false, true);
-
-                if (this.baddie.countLiving() == 0)
-                {
-                    //score += 1000;
-                    //scoreText.text = scoreString + score;
-
-                    //enemyBullets.callAll('kill', this);
-                    // stateText.text = " You Won, \n Click to restart";
-                    // stateText.visible = true;
-
-                    //the "click to restart" handler
-                    //game.input.onTap.addOnce(restart, this);
-                    console.log('You Won!')
-                }
-
+            //this.physics.arcade.collide(this.weapons[0], this.baddie);
+            this.physics.arcade.overlap(this.player, this.baddie, collisionHandler, null, this);
+            for (let i = 0; i <= 11; i++){
+                 this.physics.arcade.overlap(this.weapons[i], this.baddie, collisionHandler, null, this);
             }
 
             this.player.body.velocity.set(0);
@@ -740,6 +717,47 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
         }
 
     };
+
+    function collisionHandler (bullet, baddie) {
+                //  When a bullet hits an alien we kill them both
+                //bullet.kill();
+                baddie.kill();
+                //  Increase the score
+                // score += 20;
+                // scoreText.text = scoreString + score;
+                //  And create an explosion :)
+                var explosion = this.explosions.getFirstExists(false);
+                explosion.reset(baddie.body.x, baddie.body.y);
+                explosion.play('kaboom', 30, false, true);
+
+                if (this.baddie.countLiving() == 0){
+                    //score += 1000;
+                    //scoreText.text = scoreString + score;
+
+                    //enemyBullets.callAll('kill', this);
+                    // stateText.text = " You Won, \n Click to restart";
+                    // stateText.visible = true;
+
+                    //the "click to restart" handler
+                    //game.input.onTap.addOnce(restart, this);
+                    for (var y = 1; y < 8; y++)
+                    {
+                        for (var x = 11; x < 16; x++)
+                        {
+                            this.baddie.create(x * 50, y * 50, 'baddie');
+                        }
+                    }
+
+                }
+
+            }
+            function setupInvader (invader) {
+
+                invader.anchor.x = 0.5;
+                invader.anchor.y = 0.5;
+                invader.animations.add('kaboom');
+
+            }
 
     game.state.add('Game', PhaserGame, true);
 </script>
