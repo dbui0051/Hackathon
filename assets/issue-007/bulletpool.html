@@ -1,19 +1,17 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<meta name="description" content="Bullet Pools" />
-    <title>Phaser Hackathon Project</title>
+    <title>Bullet Pool</title>
     <meta charset="utf-8">
-    <script src="http://cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
+    <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
 </head>
 <body>
-    <div class='center'>
-    <h1>Min's and Dennis' Hackathon</h1>
+
     <div id="game"></div>
-    
-    
-<script id="jsbin-javascript">
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
+
+    <script type="text/javascript">
+
+    var game = new Phaser.Game(640, 400, Phaser.AUTO, 'game');
 
     //  Our core Bullet class
     //  This is a simple Sprite object that we set a few properties on
@@ -547,8 +545,6 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
         this.foreground = null;
 
         this.player = null;
-        this.dude = null;
-        this.baddie = null;
         this.cursors = null;
         this.speed = 300;
 
@@ -572,20 +568,17 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
 
             //  We need this because the assets are on Amazon S3
             //  Remove the next 2 lines if running locally
-            
             // this.load.baseURL = 'http://files.phaser.io.s3.amazonaws.com/codingtips/issue007/';
-            // this.load.crossOrigin = 'anonymous';
+            this.load.crossOrigin = 'anonymous';
 
-            this.load.image('background', 'assets/issue-001/assets/background.png');
-            this.load.image('foreground', 'assets/issue-007/assets/fore.png');
-            this.load.image('player', 'assets/issue-007/assets/ship.png');
-            this.load.bitmapFont('shmupfont', 'assets/issue-007/assets/shmupfont.png', 'assets/issue-007/assets/shmupfont.xml');
-            this.load.spritesheet('dude', 'assets/dude.png', 32, 48);
-            this.load.spritesheet('baddie', 'assets/baddie.png', 32, 32);
+            this.load.image('background', 'assets/back.png');
+            this.load.image('foreground', 'assets/fore.png');
+            this.load.image('player', 'assets/ship.png');
+            this.load.bitmapFont('shmupfont', 'assets/shmupfont.png', 'assets/shmupfont.xml');
 
             for (var i = 1; i <= 11; i++)
             {
-                this.load.image('bullet' + i, 'assets/issue-007/assets/bullet' + i + '.png');
+                this.load.image('bullet' + i, 'assets/bullet' + i + '.png');
             }
 
             //  Note: Graphics are not for use in any commercial project
@@ -623,8 +616,8 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
 
             this.player.body.collideWorldBounds = true;
 
-            // this.foreground = this.add.tileSprite(0, 0, this.game.width, this.game.height, 'foreground');
-            //this.foreground.autoScroll(-60, 0);
+            this.foreground = this.add.tileSprite(0, 0, this.game.width, this.game.height, 'foreground');
+            this.foreground.autoScroll(-60, 0);
 
             this.weaponName = this.add.bitmapText(8, 364, 'shmupfont', "ENTER = Next Weapon", 24);
 
@@ -635,19 +628,6 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
 
             var changeKey = this.input.keyboard.addKey(Phaser.Keyboard.ENTER);
             changeKey.onDown.add(this.nextWeapon, this);
-
-            for (var y = 1; y < 8; y++)
-            {
-                for (var x = 11; x < 16; x++)
-                {
-                    this.add.sprite(x * 50, y * 50, 'baddie');
-                    // alien.anchor.setTo(0.5, 0.5);
-                    // alien.animations.add('fly', [ 0, 1, 2, 3 ], 20, true);
-                    // alien.play('fly');
-                    // alien.body.moves = false;
-                }
-            }
-            
 
         },
 
@@ -680,37 +660,6 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
         },
 
         update: function () {
-            game.physics.arcade.collide(this.player, this.baddie);
-            game.physics.arcade.overlap(this.player, this.baddie, collisionHandler, null, this);
-            
-
-            function collisionHandler (bullet, alien) {
-                //  When a bullet hits an alien we kill them both
-                //bullet.kill();
-                this.baddie.kill();
-                //  Increase the score
-                // score += 20;
-                // scoreText.text = scoreString + score;
-                //  And create an explosion :)
-                // var explosion = explosions.getFirstExists(false);
-                // explosion.reset(alien.body.x, alien.body.y);
-                // explosion.play('kaboom', 30, false, true);
-
-                if (this.baddie.countLiving() == 0)
-                {
-                    //score += 1000;
-                    //scoreText.text = scoreString + score;
-
-                    //enemyBullets.callAll('kill', this);
-                    // stateText.text = " You Won, \n Click to restart";
-                    // stateText.visible = true;
-
-                    //the "click to restart" handler
-                    //game.input.onTap.addOnce(restart, this);
-                    console.log('You Won!')
-                }
-
-            }
 
             this.player.body.velocity.set(0);
 
@@ -742,8 +691,10 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
     };
 
     game.state.add('Game', PhaserGame, true);
-</script>
-</script>
-    </div>
+
+    </script>
+
+    <a href="http://phaser.io"><img src="http://files.phaser.io.s3.amazonaws.com/codingtips/issue007/phaser-tips-header1.png" title="Phaser Coding Tips Weekly" style="margin-top: 8px" /></a>
+
 </body>
 </html>
