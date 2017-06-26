@@ -1,13 +1,11 @@
 const express = require('express')
 const app = express()
-const nunjucks = require('nunjucks')
+const path = require('path')
 
-nunjucks.configure('views', {noCache: true})
-app.set('view engine', 'html')
-app.engine('html', nunjucks.render)
+app.use(express.static(path.join(__dirname, '/js')))
 
 app.get('/', (req, res, next) => {
-	res.render('index')
+	res.render('part1')
 })
 
 app.listen(3000, () => {
